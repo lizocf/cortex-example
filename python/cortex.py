@@ -7,6 +7,10 @@ import sys
 from pydispatch import Dispatcher
 import warnings
 import threading
+#!/usr/bin/env python
+# license removed for brevity
+import rospy
+from std_msgs.msg import String, float32, Float32MultiArray
 
 
 # define request id
@@ -76,6 +80,7 @@ class Cortex(Dispatcher):
         self.debit = 10
         self.license = ''
         self.isHeadsetConnected = False
+        self.res_dic_ros = {}
 
         if client_id == '':
             raise ValueError('Empty your_app_client_id. Please fill in your_app_client_id before running the example.')
@@ -96,7 +101,7 @@ class Cortex(Dispatcher):
             elif  key == 'headset_id':
                 self.headset_id = value
 
-    def open(self):
+    def open(self): # starts process
         url = "wss://localhost:6868"
         # websocket.enableTrace(True)
         self.ws = websocket.WebSocketApp(url, 
@@ -344,6 +349,18 @@ class Cortex(Dispatcher):
             if (self.isHeadsetConnected == False):
                 self.refresh_headset_list()
 
+    def talker(self, result_dic):
+        pub = rospy.Publisher('chatter', float32, queue_size=10)
+        rospy.init_node('talker', anonymous=True)
+        rate = rospy.Rate(10) # 10hz
+        while not rospy.is_shutdown():
+            # hello_str = "hello world %s" % rospy.get_time()
+            msg =  Float32MultiArray()
+            msg.data = result_dic['mot']
+            rospy.loginfo(msg)
+            pub.publish(msg)
+            rate.sleep()
+
     def handle_stream_data(self, result_dic):
         if result_dic.get('com') != None:
             com_data = {}
@@ -365,7 +382,7 @@ class Cortex(Dispatcher):
             eeg_data['eeg'] = result_dic['eeg']
             eeg_data['eeg'].pop() # remove markers
             eeg_data['time'] = result_dic['time']
-            self.emit('new_eeg_data', data=eeg_data)
+            self.emit('new_eeg_data', data=eeg_data)        # THIS 
         elif result_dic.get('mot') != None:
             mot_data = {}
             mot_data['mot'] = result_dic['mot']
@@ -393,6 +410,9 @@ class Cortex(Dispatcher):
             self.emit('new_sys_data', data=sys_data)
         else :
             print(result_dic)
+        breakpoint()
+        self.talker(result_dic)
+        # return result_dic
 
     def on_message(self, *args):
         recv_dic = json.loads(args[1])

@@ -36,13 +36,13 @@ class Subcribe():
         print("Subscribe __init__")
         self.c = Cortex(app_client_id, app_client_secret, debug_mode=True, **kwargs)
         self.c.bind(create_session_done=self.on_create_session_done)
-        self.c.bind(new_data_labels=self.on_new_data_labels)
-        self.c.bind(new_eeg_data=self.on_new_eeg_data)
+        # self.c.bind(new_data_labels=self.on_new_data_labels)
+        # self.c.bind(new_eeg_data=self.on_new_eeg_data)
         self.c.bind(new_mot_data=self.on_new_mot_data)
-        self.c.bind(new_dev_data=self.on_new_dev_data)
-        self.c.bind(new_met_data=self.on_new_met_data)
-        self.c.bind(new_pow_data=self.on_new_pow_data)
-        self.c.bind(inform_error=self.on_inform_error)
+        # self.c.bind(new_dev_data=self.on_new_dev_data)
+        # self.c.bind(new_met_data=self.on_new_met_data)
+        # self.c.bind(new_pow_data=self.on_new_pow_data)
+        # self.c.bind(inform_error=self.on_inform_error)
 
     def start(self, streams, headsetId=''):
         """
@@ -72,7 +72,7 @@ class Subcribe():
         if headsetId != '':
             self.c.set_wanted_headset(headsetId)
 
-        self.c.open()
+        self.c.open()   # starts everything
 
     def sub(self, streams):
         """
@@ -227,8 +227,8 @@ class Subcribe():
 def main():
 
     # Please fill your application clientId and clientSecret before running script
-    your_app_client_id = ''
-    your_app_client_secret = ''
+    your_app_client_id = 'YYzKs6b5xE5Fcc175IAxaycUMfvcNGZwD10lLtUV'
+    your_app_client_secret = 'ysRo3359LItaETtuXzQ9d7ZVnQBzUDulf6swdIgCg1nY2fKxD5SRJYnKebO82vjQydihYBv4zfkQeh19GZy6GPrmPUgBbQHOumPtcCOHi0wcKePMtbmqXqs6DECrzjIt'
 
     s = Subcribe(your_app_client_id, your_app_client_secret)
 
